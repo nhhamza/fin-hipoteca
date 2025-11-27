@@ -15,8 +15,26 @@ console.log('SMTP CONFIG:', {
 const app = express()
 const port = process.env.PORT || 3001
 
-app.use(cors())
-app.use(express.json())
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://fin-hipoteca-hrxo.vercel.app',
+]
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow tools like Postman / curl (no origin)
+      if (!origin) return callback(null, true)
+      if (allowedOrigins.includes(origin)) return callback(null, true)
+      return callback(new Error('Not allowed by CORS'))
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+  })
+)
+
+// Opcional pero no está de más:
+app.options('*', cors())
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
