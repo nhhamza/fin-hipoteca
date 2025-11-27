@@ -61,6 +61,8 @@ function sendMail(subject, html, replyTo) {
 }
 
 app.post('/api/contact', async (req, res) => {
+  console.log('BODY RECIBIDO /api/contact:', req.body)
+
   const {
     nombre,
     email,
@@ -71,8 +73,18 @@ app.post('/api/contact', async (req, res) => {
     ciudad,
   } = req.body || {}
 
-  if (!nombre || !email || !telefono) {
-    return res.status(400).json({ message: 'Faltan campos obligatorios.' })
+  // Normalizamos por si vienen undefined o con espacios
+  const nombreOk = typeof nombre === 'string' && nombre.trim() !== ''
+  const emailOk = typeof email === 'string' && email.trim() !== ''
+  const telefonoOk = typeof telefono === 'string' && telefono.trim() !== ''
+
+  if (!nombreOk || !emailOk || !telefonoOk) {
+    console.warn('Validación fallida /api/contact:', {
+      nombre,
+      email,
+      telefono,
+    })
+    return res.status(400).json({ message: 'Faltan campos obligatorios en el servidor.' })
   }
 
   const html = `
