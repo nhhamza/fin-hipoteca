@@ -35,7 +35,8 @@ app.use(
 
 // Opcional pero no está de más:
 app.options('*', cors())
-
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT) || 2525,
@@ -61,7 +62,7 @@ function sendMail(subject, html, replyTo) {
 }
 
 app.post('/api/contact', async (req, res) => {
-  console.log('BODY RECIBIDO /api/contact:', req.body)
+  console.log('BODY RECIBIDO /api/contact:', req)
 
   const {
     nombre,
